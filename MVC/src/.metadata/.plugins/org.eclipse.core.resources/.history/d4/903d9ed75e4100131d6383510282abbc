@@ -1,0 +1,46 @@
+package controle;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JPanel;
+
+import carte.Arc;
+
+import vue.VueReseau;
+
+public class VueSelection extends JPanel implements Observer {
+	
+	private ReseauSelection reseauSelectionne;
+	
+	
+	public void paint(Graphics g) {
+		super.paint(g);
+		g.drawRect(0, 0, this.getWidth(), this.getHeight());
+			if(this.reseauSelectionne!=null){
+					for(int i=0; i<this.reseauSelectionne.getReseau().getListeNoeuds().size();i++){
+						g.setColor(Color.BLUE);
+						g.fillOval(this.reseauSelectionne.getReseau().getListeNoeuds().get(i).getX()-10,this.reseauSelectionne.getReseau().getListeNoeuds().get(i).getY()-10,20,20);
+						g.setColor(Color.BLACK);
+						
+						if(reseauSelectionne.getIndex()==i){
+							g.setColor(Color.YELLOW);
+							g.fillOval(this.reseauSelectionne.getReseau().getListeNoeuds().get(reseauSelectionne.getIndex()).getX()-10, this.reseauSelectionne.getReseau().getListeNoeuds().get(reseauSelectionne.getIndex()).getY()-10, 20, 20);
+						}
+						
+						for(Arc a: this.reseauSelectionne.getReseau().getListeNoeuds().get(i).getListeArcs()){
+							g.drawLine(a.getOrigine().getX(),a.getOrigine().getY(), a.getDestination().getX(),a.getDestination().getY());		
+						}
+					}
+			}
+		}
+	
+	
+	public void update(Observable b, Object arg1) {
+		this.reseauSelectionne=(ReseauSelection)b;
+		repaint();
+	}
+
+}

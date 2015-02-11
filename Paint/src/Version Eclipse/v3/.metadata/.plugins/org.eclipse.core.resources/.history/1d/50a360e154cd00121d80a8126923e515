@@ -1,0 +1,418 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.BufferedInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Scanner;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+public class Fenetre extends JFrame {
+
+	private Color c;
+	private Color c_texte = Color.black;
+	private DessinFigure DF = new DessinFigure();
+	FigureColoree figure ;
+	String style = "Arial Narrow";
+	JPanel principale;
+	String phrase = "";
+	int taille = 16;
+	private DessinFigure[] tableau=new DessinFigure[10];
+
+	public Fenetre(String titre, int largeur, int hauteur) {
+		super(titre);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setPreferredSize(new Dimension(largeur, hauteur));
+
+		JMenuBar bar = new JMenuBar();
+		bar.setBackground(Color.GRAY);
+		JMenu File = new JMenu("File");
+		File.setForeground(Color.WHITE);
+		JMenuItem nouveau = new JMenuItem("Nouveau ");
+		JMenuItem ouvrir = new JMenuItem("Ouvrir ");
+		JMenuItem sauvgarder = new JMenuItem("Sauvgarder ");
+		File.add(nouveau);
+		File.add(ouvrir);
+		File.add(sauvgarder);
+		bar.add(File);
+		this.setJMenuBar(bar);
+		JMenu About = new JMenu("About");
+		About.setForeground(Color.WHITE);
+		bar.add(About);
+		JMenuItem des = new JMenuItem("About");
+		About.add(des);
+
+		// Action listener de Menu about
+		des.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(Fenetre.this,
+						" Ersagun \n YALCINTEPE\n S2C");
+			}
+		});
+
+		// Action listener de menu ouvrir
+		ouvrir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent f) {
+				JFileChooser chooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(
+						"Fichier format .dfg", "dfg");
+				chooser.setFileFilter(filter);
+				int returnVal = chooser.showOpenDialog(Fenetre.this);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					ObjectInputStream ois;
+					try {
+						ois = new ObjectInputStream(
+								new BufferedInputStream(new FileInputStream(
+										(chooser.getSelectedFile()))));
+						principale.remove(DF);
+						if(DF!=null)
+						DF = (DessinFigure) ois.readObject();
+						principale.add(DF);
+						repaint();
+						ois.close();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+
+		// Action listener de menu nouveau
+		nouveau.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent k) {
+				DF.nettoyer();
+				DF.repaint();
+			}
+		});
+
+		// Action listener de menu sauvgarder
+		sauvgarder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooserSave = new JFileChooser();
+				FileNameExtensionFilter filt = new FileNameExtensionFilter(
+						"Fichier format .dfg", "dfg");
+				chooserSave.setFileFilter(filt);
+				int returnVall = chooserSave.showSaveDialog(Fenetre.this);
+				if (returnVall == JFileChooser.APPROVE_OPTION) {
+					ObjectOutputStream oos;
+					try {
+						oos = new ObjectOutputStream(new BufferedOutputStream(
+								new FileOutputStream((chooserSave
+										.getSelectedFile()))));
+						if(DF!=null)
+							oos.writeObject(DF);
+						
+						oos.close();
+					} catch (FileNotFoundException h) {
+						// TODO Auto-generated catch block
+						h.printStackTrace();
+					} catch (IOException h) {
+						// TODO Auto-generated catch block
+						h.printStackTrace();
+					}
+				}
+			}
+		});
+
+		principale = new JPanel();
+		principale.setLayout(new BorderLayout());
+		PanneauChoix pc = new PanneauChoix();
+		principale.add(pc, BorderLayout.NORTH);
+		principale.add(DF, BorderLayout.CENTER);
+		this.setContentPane(principale);
+		this.pack();
+		this.setVisible(true);
+
+	}
+
+	public class PanneauChoix extends JPanel implements Serializable{
+
+		// Panneau choix qui contient les boutons
+		public PanneauChoix() {
+
+			ButtonGroup bg = new ButtonGroup();
+			final JRadioButton rb1 = new JRadioButton("Nouvelle Figure");
+			final JRadioButton rb2 = new JRadioButton("Dessin à main levée");
+			final JRadioButton rb3 = new JRadioButton("Manipulations");
+			final JRadioButton rb4 = new JRadioButton("Mot à afficher : ");
+			final JComboBox cboxFigure = new JComboBox(new String[] { "Cercle",
+					"Rectangle", "Triangle", "Quadrilatère" });
+			cboxFigure.setEnabled(false);
+			bg.add(rb1);
+			bg.add(rb2);
+			bg.add(rb3);
+			bg.add(rb4);
+			final JCheckBox action = new JCheckBox("Remplir Figure");
+			action.setEnabled(false);
+			
+			action.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					if(action.isSelected()){
+						FigureColoree.etat=true;
+						DF.repaint();
+					}
+					else{
+						FigureColoree.etat=false;
+						DF.repaint();
+					}
+				}
+				
+			});
+			
+
+			// Declaration du bouton pour changer la couleur
+			final JButton jbc = new JButton((new ImageIcon(
+					"C:/Users/Ersagun/Desktop/v3/eee.jpg")));
+			jbc.setEnabled(false);
+			
+			// Permet de changer la couleur avec le panel de couleur de java
+
+			jbc.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					c = JColorChooser.showDialog(null, "Choisissez la couleur",
+							c);
+					if (figure != null) {
+						
+						DF.figureSelectioner().changeCouleur(c);
+						jbc.setBackground(c);
+					}
+					else{
+						JLabel f=new JLabel("Creez Une figure d'abord ");
+						principale.add(f,BorderLayout.CENTER);
+					}
+					DF.repaint();
+				}
+			});
+
+			cboxFigure.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DF.supprimerListener();
+					
+					switch (cboxFigure.getSelectedIndex()) {
+					case 0:
+						figure = new UnCercle();
+						figure.couleur = c;
+						DF.construit(figure);
+						break;
+					case 1:
+						figure = new UnRectangle();
+						figure.couleur = c;
+						DF.construit(figure);
+						break;
+					case 2:
+						figure = new Triangle();
+						figure.couleur = c;
+						DF.construit(figure);
+						break;
+					case 3:
+						figure = new Quadrilatere();
+						figure.couleur = c;
+						DF.construit(figure);
+						break;
+
+					default :
+						figure = new UnCercle();
+						figure.couleur = c;
+						DF.construit(figure);
+						break;
+					}
+					repaint();
+				}
+
+			});
+
+			// Action listener de radio button construire figure
+			rb1.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DF.supprimerListener();
+					jbc.setEnabled(true);
+					action.setEnabled(true);
+					c = JColorChooser.showDialog(null, "Choisissez la couleur",
+							c);
+					cboxFigure.setEnabled(true);
+					if (figure == null){
+						figure = new UnCercle();
+						DF.construit(figure);
+						figure.couleur = c;
+					}
+					
+				}
+			});
+
+			// Action listener de radio button qui trace manuel
+			rb2.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DF.supprimerListener();
+					MouseMotionHandler mouse =new MouseMotionHandler();
+					this.add(mouse);
+					jbc.setEnabled(false);
+					c_texte = JColorChooser.showDialog(null,
+							"Choisissez la couleur", c_texte);
+					DF.trace(c_texte);
+					repaint();
+				}
+			});
+
+			rb3.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					DF.supprimerListener();
+
+					DF.activeModificationsSouris();
+				}
+			});
+
+			// Declaration du bouton : Nettoyer
+			final JButton jb = new JButton("Nettoyer");
+			jb.setIcon(new ImageIcon("C:/Users/Ersagun/Desktop/v3/images.jpg"));
+			// Permet de réinitialiser la fenêtre de dessin à son état initial
+			jb.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DF.nettoyer();
+					DF.repaint();
+				}
+			});
+
+			// Declaration du bouton d'entrée de texte
+			final JTextField text = new JTextField("");
+			text.setColumns(10);
+			text.setEnabled(false);
+
+			// Declaration du menu déroulant permattant de choisir le style de
+			// la police
+			final JComboBox jcb4 = new JComboBox(new String[] { "Arial Narrow",
+					"Comic Sans MS", "Courier New", "Georgia",
+					"Times New Roman", " Verdana" });
+			jcb4.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						switch (jcb4.getSelectedIndex()) {
+						case 0:
+							style = "Arial Narrow";
+							break;
+						case 1:
+							style = "Comic Sans MS";
+							break;
+						case 2:
+							style = "Courier New";
+							break;
+						case 3:
+							style = "Georgia";
+							break;
+						case 4:
+							style = "Time New Roman";
+							break;
+						case 5:
+							style = "Verdana";
+						}
+
+					}
+				}
+			});
+
+			jcb4.setEnabled(false);
+
+			SpinnerNumberModel model = new SpinnerNumberModel(16, 4, 72, 1);
+			final JSpinner js = new JSpinner(model);
+			js.setEnabled(false);
+
+			// Declaration du bouton Ecrire
+			final JButton jb2 = new JButton("Ecrire");
+			jb2.setEnabled(false);
+			// Permet d'actionner l'ecriture du mot avec la taille et la police
+			// correspondante à chaque clique
+			jb2.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DF.supprimerListener();
+					phrase = text.getText();
+					taille = ((Integer) js.getValue()).intValue();
+					DF.ecrireTexte(taille, style, phrase, c_texte);
+					DF.repaint();
+					cboxFigure.setEnabled(true);
+					jb2.setEnabled(false);
+					rb1.setEnabled(true);
+					rb2.setEnabled(true);
+					rb3.setEnabled(true);
+					jcb4.setEnabled(false);
+					js.setEnabled(false);
+					jbc.setEnabled(false);
+				}
+			});
+			
+			
+			// Action listener de radio button mot a afficher
+			rb4.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DF.supprimerListener();
+					c_texte = JColorChooser.showDialog(null,
+							"Choisissez la couleur", c_texte);
+					jb2.setEnabled(true);
+					text.setEnabled(true);
+					cboxFigure.setEnabled(false);
+					jcb4.setEnabled(true);
+					js.setEnabled(true);
+					jbc.setEnabled(false);
+					repaint();
+				}
+			});
+
+			JTabbedPane tabbedPane = new JTabbedPane();
+			tabbedPane.addTab("Sans Titre", DF);
+			principale.add(tabbedPane,BorderLayout.CENTER);
+			
+			JPanel haut = new JPanel();
+			JPanel bas = new JPanel();
+			JPanel plusbas = new JPanel();
+			haut.add(rb1);
+			haut.add(rb2);
+			haut.add(rb3);
+			haut.add(jbc);
+			haut.add(action);
+			bas.add(cboxFigure);
+			bas.add(jb);
+			plusbas.add(rb4);
+			plusbas.add(text);
+			plusbas.add(jb2);
+			plusbas.add(jcb4);
+			plusbas.add(js);
+			
+			this.setLayout(new GridLayout(3, 1));
+			this.add(haut);
+			this.add(bas);
+			this.add(plusbas);
+		}
+	}
+	
+	private class MouseMotionHandler implements MouseMotionListener {
+		  public void mouseMoved(MouseEvent e) {
+		    if (e.getPoint() == null) {
+		      setCursor(Cursor.getDefaultCursor());
+		      }
+		    else
+		      setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR) );
+		      }
+
+		@Override
+		public void mouseDragged(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+  }
+

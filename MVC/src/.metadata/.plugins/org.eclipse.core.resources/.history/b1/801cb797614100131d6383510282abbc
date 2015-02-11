@@ -1,0 +1,45 @@
+package controle;
+
+import java.awt.event.MouseEvent;
+
+import javax.swing.SwingUtilities;
+import javax.swing.event.MouseInputAdapter;
+
+public class ControleurSelection extends MouseInputAdapter {
+
+	private ReseauSelection reseauSelected;
+	private boolean pressed=false;
+
+	public ControleurSelection(ReseauSelection rs) {
+		super();
+		this.reseauSelected = rs;
+	}
+
+	public void mousePressed(MouseEvent e) {
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			reseauSelected.selectionne(e.getX(), e.getY());
+			pressed=true;
+		}
+	}
+
+	public void mouseDragged(MouseEvent f) {
+		if (SwingUtilities.isLeftMouseButton(f)) {
+			reseauSelected.deplacer(f.getX(), f.getY());
+			
+		}
+	}
+
+	public void mouseReleased(MouseEvent g) {
+		if (SwingUtilities.isLeftMouseButton(g)) {
+			reseauSelected.deselectionne();
+		}
+	}
+
+	public ReseauSelection Rs() {
+		return this.reseauSelected;
+	}
+	
+	public boolean getPressed(){
+		return this.pressed;
+	}
+}

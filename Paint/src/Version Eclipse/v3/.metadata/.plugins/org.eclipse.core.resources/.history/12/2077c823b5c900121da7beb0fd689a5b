@@ -1,0 +1,178 @@
+import java.io.*;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
+public class DessinFigure extends JPanel implements Serializable{
+		
+	protected FigureColoree figure[]= new FigureColoree [20];
+	private int nbf=0;
+	private int sel=-1;
+	
+	
+	public void ajoute(FigureColoree f){
+		try{
+			figure[nbf]=f;
+			nbf++;
+			sel=nbf-1;
+			f.selectionner();
+		}catch(Exception e){
+			System.out.println("Erreur, limite du tableau depassees");
+		}
+	}
+	
+	public int nbFigure(){
+		return nbf;
+	}
+	
+	public FigureColoree figureSelectioner(){
+		if(nbf!=0){		
+				return figure[sel];
+		}else{
+			return null;
+		}
+	}
+	
+
+	
+	public void selectionProchaineFigure(){
+		figure[sel].deselectionner();
+		if(sel==nbf-1){
+			sel=0;
+		}else{
+			sel++;
+		}
+		figure[sel].selectionner();
+	}
+	
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		if(nbf>0){
+			for(int i=0;i<this.nbFigure();i++){
+				figure[i].affiche(g);
+				figure[i].afficheFigure(g);
+			}
+		}
+	}
+	
+	public void trace (Color c){
+		TraceurForme TF = new TraceurForme(this.getGraphics(),c,this);
+		addMouseListener(TF);
+		addMouseMotionListener(TF);
+	}	
+	
+	public void construit ( FigureColoree f){
+		FabricantFigure FF = new FabricantFigure(this, f);
+		addMouseListener(FF);
+		sel=-1;
+	}
+	
+	public void nettoyer(){
+		for( int i=0; i<nbf; i++){
+			figure[i]= null;
+		}
+		nbf=0;
+		sel=-1;
+	}
+	
+	public void activeModificationsSouris(){
+		ManipulateurFormes MF = new ManipulateurFormes();
+		addMouseListener(MF);
+		addMouseMotionListener(MF);
+	}
+	
+
+
+	public class ManipulateurFormes implements MouseListener, MouseMotionListener {
+
+		
+		int lastx, lasty;
+		
+		public void mouseClicked(MouseEvent e) {
+			if(SwingUtilities.isRightMouseButton(e)){
+				removeMouseListener(this);
+				removeMouseMotionListener(this);
+			}
+		}
+
+
+		public void mouseEntered(MouseEvent e) {
+	
+		}
+
+
+		public void mouseExited(MouseEvent e) {
+			
+		}
+
+
+		public void mousePressed(MouseEvent e) {
+			if(SwingUtilities.isLeftMouseButton(e)) {
+				if(sel != -1){
+					int x = e.getX();
+					int y = e.getY();
+					for (int i=0; i<nbFigure(); i++){
+						if(figure[i].estContenuDans(x,y)){
+							figure[sel].deselectionner();
+							sel=i;
+							figure[i].selectionner();
+						}
+					}
+					lastx = x;
+					lasty = y;
+					
+				}
+			}
+		}
+
+
+		public void mouseReleased(MouseEvent e) {
+			
+		}
+		
+		public void mouseDragged(MouseEvent e) {
+			if(SwingUtilities.isLeftMouseButton(e) && nbf>=1){
+				figure[sel].translater(e.getX()-lastx,e.getY()-lasty);
+				figure[sel].selectionner();
+				repaint();
+				}
+			lastx = e.getX();
+			lasty = e.getY();
+			
+		}
+
+		public void mouseMoved(MouseEvent e) {
+			
+		}
+		
+	}
+	
+	
+	/**
+	 * Méthode permettant de créer un objet de type Text
+	 * @param t taille de la chaine de caractere
+	 * @param e police de la chaine de caractere
+	 * @param s chaine de caractere
+	 * @param c couleur de la chaine de caractere
+	 */
+	public void ecrireTexte(int t, String e, String s, Color c){
+		T = new Text(t,e,s,this.getGraphics(), this,c ); 
+		addMouseListener(T);
+		addMouseMotionListener(T);
+		
+	}
+
+
+
+	public void supprimerListener() {
+		MouseListener[] mls = (MouseListener[])(this.getListeners(MouseListener.class));
+		for(int i=0;i<mls.length;i++)
+			removeMouseListener(mls[i]);
+		MouseMotionListener[] mml=(MouseMotionListener[])(this.getListeners(MouseMotionListener.class));
+		for(int i=0;i<mml.length;i++)
+			removeMouseMotionListener(mml[i]);
+	}
+}
+		
+		

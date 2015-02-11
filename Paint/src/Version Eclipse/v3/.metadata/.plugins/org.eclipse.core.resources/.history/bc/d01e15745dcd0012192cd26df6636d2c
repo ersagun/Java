@@ -1,0 +1,17 @@
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Scanner;
+
+public class Dialogue{
+	public static void main(String[] args){
+		Fenetre f= new Fenetre("Fenetre",1024,700);
+		
+		}
+}
+

@@ -1,0 +1,1 @@
+jar -cf carte.jar bin/carte/*.class

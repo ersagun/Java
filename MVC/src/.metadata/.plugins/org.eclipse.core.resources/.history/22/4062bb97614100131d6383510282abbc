@@ -1,0 +1,109 @@
+package carte;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+
+import controle.ReseauSelection;
+
+
+
+public class Reseau extends Observable implements Cloneable {
+
+	//Attributs
+	
+	private ArrayList<Noeud> listeNoeuds;
+	
+	
+	
+
+	//Constructeur
+	
+	/**
+	 * Constructeur de reseu
+	 * @param listeNoeuds liste des noeuds
+	 */
+	public Reseau() {
+		super();
+		this.listeNoeuds = new ArrayList<Noeud>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Reseau(Reseau r){
+		this.listeNoeuds = new ArrayList<Noeud>();
+		Noeud n;
+		for(int i=0; i<r.listeNoeuds.size();i++){
+				n=r.listeNoeuds.get(i);
+				this.listeNoeuds.add(new Noeud(n.getX(),n.getY()));
+		}
+		int j;
+		for(int i=0;i<r.listeNoeuds.size();i++){
+			n=r.listeNoeuds.get(i);
+			for(Arc a:n.getListeArcs()){
+					j=r.listeNoeuds.indexOf(a.getDestination());
+					this.listeNoeuds.get(i).addArc(this.listeNoeuds.get(j));
+			}
+		}
+	}
+
+
+	//Methodes
+	
+	/**
+	 * Ajoute un noeud au reseau
+	 * @param n noeud a ajouter
+	 */
+	public void addNoeud(Noeud n){
+			this.listeNoeuds.add(n);
+			setChanged();
+			notifyObservers();
+	}
+	
+	public ArrayList<Noeud> getListeNoeuds(){
+			return this.listeNoeuds;
+	}
+	
+	
+	/**
+	 * Ajoute un arc au reseau avec des noeuds de dest et noeud d'origine au parametre
+	 * @param origine noeud d'origine
+	 * @param destination noeud de destination
+	 */
+	public void addArc(Noeud origine, Noeud destination) throws NoeudAbsentException {
+	
+			
+		if(!listeNoeuds.contains(origine)&&(!listeNoeuds.contains(destination)))
+			throw new NoeudAbsentException();
+
+			origine.addArc(destination);
+			destination.addArc(origine);
+			setChanged();
+			notifyObservers();
+	}
+	
+	public Object clone() throws CloneNotSupportedException{
+		return super.clone();
+	}
+	
+
+	public void deplacer(int x, int y) {
+		if (ReseauSelection.indexx != -1) {
+			try {
+				Noeud n = this.getListeNoeuds().get(ReseauSelection.indexx);
+				n.setX(x);
+				this.setChanged();
+				this.notifyObservers();
+				n.setY(y);
+				this.setChanged();
+				this.notifyObservers();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+
+	}
+	
+	public void permierDessin() {
+		this.setChanged();
+		this.notifyObservers();
+	}
+}

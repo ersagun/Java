@@ -1,0 +1,19 @@
+package carte;
+	/**
+	 * @param exception en cas d'absence de noeud.
+	 */
+/**
+*
+* @author Ersagun YALCINTEPE, Tom VERHOOF S3B
+*
+*/
+public class NoeudAbsentException extends Exception {
+
+
+		public NoeudAbsentException() {
+			super();
+		}
+
+
+	
+}

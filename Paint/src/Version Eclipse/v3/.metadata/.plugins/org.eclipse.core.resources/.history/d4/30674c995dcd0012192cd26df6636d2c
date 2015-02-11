@@ -1,0 +1,8 @@
+
+public class Dialogue{
+	public static void main(String[] args){
+		Fenetre f= new Fenetre("Fenetre",1024,700);
+		
+		}
+}
+

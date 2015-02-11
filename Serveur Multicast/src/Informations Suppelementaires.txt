@@ -1,0 +1,4 @@
+L'execution de serv : 
+
+java Serv adresse port nomUtilisateur
+

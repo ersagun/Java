@@ -1,0 +1,33 @@
+import java.awt.*;
+
+@SuppressWarnings("serial")
+public class UnCercle extends ConiqueCentre{
+
+	public double rendreRayon(){
+		return tab_mem[0].distance(tab_mem[1]);
+	}
+	
+	public int nbPoints(){
+		return 2;
+	}
+	
+	public void affiche(Graphics g){
+		UnPoint c=this.rendreCentre();
+		int x=c.getAbscisse()-(int)this.rendreRayon();
+		int y=c.getOrdonnee()-(int)this.rendreRayon();
+		g.setColor(couleur);
+
+		if(etat==true){
+			g.fillOval(x,y,(int)this.rendreRayon()*2,(int)this.rendreRayon()*2);
+		}
+		else{
+			g.drawOval(x,y,(int)this.rendreRayon()*2,(int)this.rendreRayon()*2);
+		}
+	}
+	
+	public void modifierPoint(UnPoint tab_saisie []){
+		tab_mem=new UnPoint[tab_saisie.length];
+		tab_mem[0]=tab_saisie[0];
+		tab_mem[1]=tab_saisie[1];
+	}
+}

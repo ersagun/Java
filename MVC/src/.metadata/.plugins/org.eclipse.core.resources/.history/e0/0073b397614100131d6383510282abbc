@@ -1,0 +1,57 @@
+package vue;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JPanel;
+
+import carte.Arc;
+import carte.Noeud;
+import carte.Reseau;
+
+/**
+*
+* @author Ersagun YALCINTEPE, Tom VERHOOF S3B
+*
+*/
+public class VueReseau extends JPanel implements Observer {
+		
+		public Reseau r;
+		
+		public VueReseau(Reseau r){
+			super();
+			this.r=r;
+		}
+		
+		public void paint(Graphics g) {
+			super.paint(g);
+			g.drawRect(0, 0, this.getWidth(), this.getHeight());
+				if(this.r!=null){
+						for(int i=0; i<this.r.getListeNoeuds().size();i++){
+							g.setColor(Color.BLUE);
+							g.fillOval(this.r.getListeNoeuds().get(i).getX()-10,this.r.getListeNoeuds().get(i).getY()-10,20,20);
+							g.setColor(Color.BLACK);
+							
+							
+							for(Arc a: this.r.getListeNoeuds().get(i).getListeArcs()){
+								g.drawLine(a.getOrigine().getX(),a.getOrigine().getY(), a.getDestination().getX(),a.getDestination().getY());		
+							}
+						}
+				}
+			}
+		
+
+		public void update(Observable o, Object arg) {
+			r=(Reseau)o;
+			repaint();
+			
+		}
+		
+		public Reseau getReseau(){
+			return this.r;
+		}
+		
+}

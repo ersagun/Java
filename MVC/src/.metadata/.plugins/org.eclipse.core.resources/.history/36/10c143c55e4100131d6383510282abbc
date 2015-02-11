@@ -1,0 +1,53 @@
+package controle;
+
+import java.awt.event.MouseEvent;
+import java.util.Observer;
+
+import javax.swing.JFrame;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputAdapter;
+
+import vue.VueReseau;
+
+import carte.Noeud;
+import carte.Reseau;
+
+/**
+*
+* @author Ersagun YALCINTEPE, Tom VERHOOF S3B
+*
+*/
+public class Controleur extends MouseInputAdapter {
+
+		//Attributs
+	
+		private Reseau reseau;
+		private boolean pressed=false;
+
+		public Controleur(Reseau r) {
+			super();
+			this.reseau = r;
+		}
+
+
+
+		public void mouseDragged(MouseEvent f) {
+			if (SwingUtilities.isLeftMouseButton(f)) {
+				reseau.deplacer(f.getX(), f.getY());
+
+			}
+		}
+
+
+		public Reseau R() {
+			return this.reseau;
+		}
+		
+		public boolean getPressed(){
+			return this.pressed;
+		}
+
+}
